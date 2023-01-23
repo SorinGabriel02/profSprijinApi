@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Post = require("../models/postsModel");
-const Comment = require("../models/commentModel");
+const Comment = require("../models/commentsModel");
 const { validationResult } = require("express-validator");
 
 const { transporter, mailOptions } = require("../services/nodemailer");

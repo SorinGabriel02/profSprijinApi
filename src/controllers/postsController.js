@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const Post = require("../models/postsModel");
-const Comment = require("../models/commentModel");
+const Comment = require("../models/commentsModel");
 
 const getPostsByPage = async (req, res) => {
   const { pageName } = req.params;

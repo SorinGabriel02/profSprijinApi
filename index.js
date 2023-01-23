@@ -34,13 +34,12 @@ app.use("/api/media", mediaRouter);
 
 const port = process.env.PORT || 8080;
 
+mongoose.set("strictQuery", false);
 mongoose.connect(
   process.env.MONGO_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
   },
   err => {
     if (err) return console.log(err);
