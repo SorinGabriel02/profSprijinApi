@@ -38,9 +38,10 @@ const newComment = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    await (await newComment.save({ session }))
-      .populate("author", "username")
-      .execPopulate();
+    const savedComment = await newComment.save({ session });
+
+    await savedComment.populate("author", "username", "User");
+
     // this push() belongs to mongoose, not standard JS push()
     post.comments.push(newComment);
     await post.save({ session });
@@ -66,6 +67,8 @@ const newComment = async (req, res, next) => {
     // send back new comment with an extra "id" prop = to "_id"
     res.status(201).json({ comment: newComment.toObject({ getters: true }) });
   } catch (error) {
+    console.log("error adding comment::", error);
+
     res.status(500).json({
       errorMessage: "Eroare de server. Comentariul nu a putut fi creat.",
     });
