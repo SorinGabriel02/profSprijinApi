@@ -123,36 +123,29 @@ const deletePost = async (req, res, next) => {
         .status(404)
         .json({ errorMessage: "Articolul nu a fost găsit." });
     }
-    // start a session
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // delete the actual post
+    await Post.findByIdAndDelete(toDelete._id);
+
     // delete post reference from author
     toDelete.author.posts.pull({ _id: toDelete._id });
     // check to see if the author has comments
-    toDelete.author.save({ session });
+    toDelete.author.save();
 
     // delete each comment reference from their respective user/author
     for (let comment of toDelete.comments) {
       // forEach comment delete it's reference from the respective user
-      await User.findByIdAndUpdate(
-        comment.author._id,
-        {
-          comments: comment.author.comments.pull({ _id: comment._id }),
-        },
-        { session }
-      );
+      await User.findByIdAndUpdate(comment.author._id, {
+        comments: comment.author.comments.pull({ _id: comment._id }),
+      });
 
       // delete the related comment document from database
-      await Comment.findByIdAndDelete(comment._id, { session });
+      await Comment.findByIdAndDelete(comment._id);
     }
-
-    // delete the actual post
-    await Post.findByIdAndDelete(toDelete._id, { session });
-
-    await session.commitTransaction();
 
     res.sendStatus(204);
   } catch (error) {
+    console.log("error::", error);
+
     res.status(500).json({
       errorMessage: "A intervenit o eroare. Te rog să încerci mai târziu.",
     });
